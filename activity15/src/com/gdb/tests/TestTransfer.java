@@ -23,7 +23,9 @@ public class TestTransfer {
         //
         // HINT: Declare both as Account (not IAccount) so you can call the daily-limit methods later.
         // ============================================================
-        // TODO: create acc1 and acc2 with AccountFactory and set PIN 1234 on acc1
+        Account acc1 = (Account) AccountFactory.createAccount("SAVINGS", 1001, "Rajesh Sharma", 30, 100000);
+        Account acc2 = (Account) AccountFactory.createAccount("SAVINGS", 1002, "Priya Patel", 28, 20000);
+        acc1.setPin(1234);
 
         // ============================================================
         // 📝 STEP 10: Successful Transfer
@@ -32,7 +34,8 @@ public class TestTransfer {
         //   1. Call svc.transfer(acc1, acc2, 5000, 1234).
         //   2. Print both balances, e.g. "Transfer Rs. 5,000: SUCCESS | acc1 = Rs. 95000.0 | acc2 = Rs. 25000.0".
         // ============================================================
-        // TODO: transfer Rs. 5,000 from acc1 to acc2 and print both balances
+        svc.transfer(acc1, acc2, 5000, 1234);
+        System.out.printf("Transfer Rs. 5,000: SUCCESS | acc1 = Rs. %.1f | acc2 = Rs. %.1f%n", acc1.getBalance(), acc2.getBalance());
 
         // ============================================================
         // 📝 STEP 11: Insufficient Balance
@@ -43,7 +46,11 @@ public class TestTransfer {
         //
         // HINT: acc1 must keep its Rs. 10,000 minimum balance, so only Rs. 85,000 can leave it.
         // ============================================================
-        // TODO: attempt a Rs. 1,00,000 transfer and catch InsufficientBalanceException
+        try {
+            svc.transfer(acc1, acc2, 100000, 1234);
+        } catch (InsufficientBalanceException e) {
+            System.out.println("Caught expected exception: " + e.getMessage());
+        }
 
         // ============================================================
         // 📝 STEP 12: Daily Limit Breach
@@ -55,7 +62,15 @@ public class TestTransfer {
         //
         // HINT: Rs. 5,000 is already used today, so the third Rs. 20,000 transfer crosses the limit.
         // ============================================================
-        // TODO: transfer repeatedly until the daily limit is breached, then catch and print the exception
+        System.out.println("Daily transfer limit: Rs. " + acc1.getDailyTransferLimit());
+        try {
+            for (int i = 0; i < 5; i++) {
+                svc.transfer(acc1, acc2, 20000, 1234);
+                System.out.printf("Transfer Rs. 20,000: SUCCESS | acc1 = Rs. %.1f | acc2 = Rs. %.1f%n", acc1.getBalance(), acc2.getBalance());
+            }
+        } catch (AccountException e) {
+            System.out.println("Caught expected exception: " + e.getMessage());
+        }
 
         // ============================================================
         // 📝 STEP 13: Print Remaining Limit
@@ -65,6 +80,7 @@ public class TestTransfer {
         //
         // HINT: Total used + remaining should add up to the daily limit.
         // ============================================================
-        // TODO: print acc1.getRemainingDailyTransferLimit()
+        System.out.println("Daily transfer total: Rs. " + acc1.getDailyTransferTotal());
+        System.out.println("Remaining daily limit: Rs. " + acc1.getRemainingDailyTransferLimit());
     }
 }

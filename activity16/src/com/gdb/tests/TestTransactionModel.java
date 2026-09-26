@@ -14,40 +14,29 @@ public class TestTransactionModel {
 
         // ============================================================
         // 📝 STEP 10: Deposit with Transaction
-        //
-        // INSTRUCTIONS:
-        //   1. Create acc1 (Savings, 1001, "Rajesh Sharma", 30, 50000) and set PIN 1234.
-        //   2. Call acc1.depositWithTransaction(5000).
-        //   3. Print the returned Transaction object.
         // ============================================================
-        // TODO: perform depositWithTransaction and print the returned Transaction
+        Account acc1 = (Account) AccountFactory.createAccount("SAVINGS", 1001, "Rajesh Sharma", 30, 50000);
+        acc1.setPin(1234);
+        Transaction txn1 = acc1.depositWithTransaction(5000);
+        System.out.println("\n[STEP 10] Deposit Transaction: " + txn1);
 
         // ============================================================
         // 📝 STEP 11: Withdraw with Transaction
-        //
-        // INSTRUCTIONS:
-        //   1. Call acc1.withdrawWithTransaction(2000, 1234).
-        //   2. Print the returned Transaction object.
         // ============================================================
-        // TODO: perform withdrawWithTransaction and print the returned Transaction
+        Transaction txn2 = acc1.withdrawWithTransaction(2000, 1234);
+        System.out.println("[STEP 11] Withdrawal Transaction: " + txn2);
 
         // ============================================================
         // 📝 STEP 12: Transfer with Transaction
-        //
-        // INSTRUCTIONS:
-        //   1. Create acc2 (Savings, 1002, "Priya Patel", 28, 20000).
-        //   2. Call svc.transferWithTransaction(acc1, acc2, 1000, 1234).
-        //   3. Print the returned Transaction object.
         // ============================================================
-        // TODO: perform transferWithTransaction and print the returned Transaction
+        Account acc2 = (Account) AccountFactory.createAccount("SAVINGS", 1002, "Priya Patel", 28, 20000);
+        Transaction txn3 = svc.transferWithTransaction(acc1, acc2, 1000, 1234);
+        System.out.println("[STEP 12] Transfer Transaction: " + txn3);
 
         // ============================================================
         // 📝 STEP 13: Backward Compatibility Check
-        //
-        // INSTRUCTIONS:
-        //   1. Call acc1.deposit(1000) using the legacy void method.
-        //   2. Print acc1.getAccountInfo() showing updated balance.
         // ============================================================
-        // TODO: call legacy deposit(1000) and verify account balance
+        acc1.deposit(1000);
+        System.out.println("[STEP 13] Legacy Deposit +1000: " + acc1.getAccountInfo());
     }
 }

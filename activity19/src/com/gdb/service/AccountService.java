@@ -17,7 +17,10 @@ public class AccountService {
     // ============================================================
     // 📝 STEP 1: Declare Fields
     // ============================================================
-    // TODO: declare accounts map, logger, transferService, and nextAccountNumber
+    private Map<Integer, IAccount> accounts;
+    private TransactionLogger logger;
+    private TransferService transferService;
+    private int nextAccountNumber = 1001;
 
     // ============================================================
     // 📝 STEP 2: Constructor
@@ -29,9 +32,11 @@ public class AccountService {
     //   4. Initialize transferService = new TransferService().
     //   5. Initialize nextAccountNumber = 1001.
     // ============================================================
-    // TODO: implement constructor
     public AccountService(TransactionLogger logger) {
-        // TODO: Step 2 - implement constructor
+        this.logger = logger;
+        this.accounts = new HashMap<>();
+        this.transferService = new TransferService();
+        this.nextAccountNumber = 1001;
     }
 
     // ============================================================
@@ -46,8 +51,10 @@ public class AccountService {
     // TODO: open and register a new account
     public IAccount openAccount(String type, String name, int age, double initialBalance)
             throws AccountException {
-        // TODO: Step 3 - implement openAccount
-        return null;
+        int accountNumber = nextAccountNumber++;
+        IAccount account = AccountFactory.createAccount(type, accountNumber, name, age, initialBalance);
+        accounts.put(accountNumber, account);
+        return account;
     }
 
     // ============================================================
@@ -61,7 +68,14 @@ public class AccountService {
     // ============================================================
     // TODO: close account after PIN verification
     public void closeAccount(int accountNumber, int pin) throws AccountException {
-        // TODO: Step 4 - implement closeAccount
+        IAccount account = accounts.get(accountNumber);
+        if (account == null) {
+            throw new AccountException("Account not found: " + accountNumber);
+        }
+        if (!account.verifyPin(pin)) {
+            throw new InvalidPinException("Incorrect PIN");
+        }
+        account.closeAccount();
     }
 
     // ============================================================
@@ -76,8 +90,14 @@ public class AccountService {
     // ============================================================
     // TODO: execute and log deposit command
     public Transaction deposit(int accountNumber, double amount) throws Exception {
-        // TODO: Step 5 - implement deposit
-        return null;
+        IAccount account = accounts.get(accountNumber);
+        if (account == null) {
+            throw new AccountException("Account not found: " + accountNumber);
+        }
+        DepositCommand cmd = new DepositCommand(account, amount);
+        cmd.execute();
+        logger.log(cmd);
+        return cmd.getTransaction();
     }
 
     // ============================================================
@@ -92,8 +112,14 @@ public class AccountService {
     // ============================================================
     // TODO: execute and log withdraw command
     public Transaction withdraw(int accountNumber, double amount, int pin) throws Exception {
-        // TODO: Step 6 - implement withdraw
-        return null;
+        IAccount account = accounts.get(accountNumber);
+        if (account == null) {
+            throw new AccountException("Account not found: " + accountNumber);
+        }
+        WithdrawCommand cmd = new WithdrawCommand(account, amount, pin);
+        cmd.execute();
+        logger.log(cmd);
+        return cmd.getTransaction();
     }
 
     // ============================================================
@@ -109,8 +135,18 @@ public class AccountService {
     // TODO: execute and log transfer command
     public Transaction transfer(int fromAccountNumber, int toAccountNumber,
                                 double amount, int pin) throws Exception {
-        // TODO: Step 7 - implement transfer
-        return null;
+        IAccount fromAccount = accounts.get(fromAccountNumber);
+        IAccount toAccount = accounts.get(toAccountNumber);
+        if (fromAccount == null) {
+            throw new AccountException("Source account not found: " + fromAccountNumber);
+        }
+        if (toAccount == null) {
+            throw new AccountException("Destination account not found: " + toAccountNumber);
+        }
+        TransferCommand cmd = new TransferCommand(fromAccount, toAccount, amount, pin);
+        cmd.execute();
+        logger.log(cmd);
+        return cmd.getTransaction();
     }
 
     // ============================================================
@@ -121,8 +157,7 @@ public class AccountService {
     // ============================================================
     // TODO: return account by number
     public IAccount getAccount(int accountNumber) {
-        // TODO: Step 8 - return account by number
-        return null;
+        return accounts.get(accountNumber);
     }
 
     // ============================================================
@@ -133,8 +168,7 @@ public class AccountService {
     // ============================================================
     // TODO: return list of all active accounts
     public List<IAccount> getAllAccounts() {
-        // TODO: Step 9 - return list of all active accounts
-        return new ArrayList<>();
+        return new ArrayList<>(accounts.values());
     }
 
     // ============================================================
@@ -145,8 +179,7 @@ public class AccountService {
     // ============================================================
     // TODO: return all logged transaction commands
     public List<TransactionCommand> getTransactionHistory() {
-        // TODO: Step 10 - return all logged transaction commands
-        return new ArrayList<>();
+        return logger != null ? logger.readAll() : new ArrayList<>();
     }
 
     // ============================================================
@@ -157,7 +190,6 @@ public class AccountService {
     // ============================================================
     // TODO: return next available account number
     public int getNextAccountNumber() {
-        // TODO: Step 11 - return next available account number
-        return 0;
+        return nextAccountNumber;
     }
 }

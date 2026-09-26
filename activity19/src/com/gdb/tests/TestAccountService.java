@@ -23,7 +23,9 @@ public class TestAccountService {
         //   2. TransactionLogger logger = new TransactionLogger(dest);
         //   3. AccountService service = new AccountService(logger);
         // ============================================================
-        // TODO: initialize MemoryLogDestination, TransactionLogger, and AccountService
+        LogDestination dest = new MemoryLogDestination();
+        TransactionLogger logger = new TransactionLogger(dest);
+        AccountService service = new AccountService(logger);
 
         // ============================================================
         // 📝 STEP 13: Open Two Accounts
@@ -35,7 +37,12 @@ public class TestAccountService {
         //   4. jane.setPin(5678);
         //   5. Print both accounts using getAccountInfo().
         // ============================================================
-        // TODO: open accounts for John and Jane
+        IAccount john = service.openAccount("SAVINGS", "John Doe", 25, 15000);
+        john.setPin(1234);
+        IAccount jane = service.openAccount("SAVINGS", "Jane Smith", 30, 10000);
+        jane.setPin(5678);
+        System.out.println("[STEP 13] Opened: " + john.getAccountInfo());
+        System.out.println("[STEP 13] Opened: " + jane.getAccountInfo());
 
         // ============================================================
         // 📝 STEP 14: Deposit into John's Account
@@ -44,7 +51,8 @@ public class TestAccountService {
         //   1. Transaction txn = service.deposit(john.getAccountNumber(), 5000);
         //   2. Print txn.
         // ============================================================
-        // TODO: execute deposit through service
+        Transaction txn = service.deposit(john.getAccountNumber(), 5000);
+        System.out.println("\n[STEP 14] Deposit: " + txn);
 
         // ============================================================
         // 📝 STEP 15: Withdraw from John's Account
@@ -53,7 +61,8 @@ public class TestAccountService {
         //   1. Transaction wtxn = service.withdraw(john.getAccountNumber(), 2000, 1234);
         //   2. Print wtxn.
         // ============================================================
-        // TODO: execute withdrawal through service
+        Transaction wtxn = service.withdraw(john.getAccountNumber(), 2000, 1234);
+        System.out.println("[STEP 15] Withdrawal: " + wtxn);
 
         // ============================================================
         // 📝 STEP 16: Transfer from John to Jane
@@ -62,7 +71,8 @@ public class TestAccountService {
         //   1. Transaction ttxn = service.transfer(john.getAccountNumber(), jane.getAccountNumber(), 1000, 1234);
         //   2. Print ttxn.
         // ============================================================
-        // TODO: execute transfer through service
+        Transaction ttxn = service.transfer(john.getAccountNumber(), jane.getAccountNumber(), 1000, 1234);
+        System.out.println("[STEP 16] Transfer: " + ttxn);
 
         // ============================================================
         // 📝 STEP 17: Print Final Balances
@@ -70,7 +80,9 @@ public class TestAccountService {
         // INSTRUCTIONS:
         //   Print john.getBalance() and jane.getBalance().
         // ============================================================
-        // TODO: print updated balances
+        System.out.println("\n[STEP 17] Final Balances:");
+        System.out.println("  John (Account #" + john.getAccountNumber() + "): Rs. " + john.getBalance());
+        System.out.println("  Jane (Account #" + jane.getAccountNumber() + "): Rs. " + jane.getBalance());
 
         // ============================================================
         // 📝 STEP 18: Print Transaction History
@@ -79,7 +91,11 @@ public class TestAccountService {
         //   1. List<TransactionCommand> history = service.getTransactionHistory();
         //   2. Print size and each command's transaction.
         // ============================================================
-        // TODO: print full transaction history
+        List<TransactionCommand> history = service.getTransactionHistory();
+        System.out.println("\n[STEP 18] Transaction History (" + history.size() + " records):");
+        for (int i = 0; i < history.size(); i++) {
+            System.out.println("  [" + (i + 1) + "] " + history.get(i).getTransaction());
+        }
 
         // ============================================================
         // 📝 STEP 19: Test Error Cases
@@ -88,6 +104,16 @@ public class TestAccountService {
         //   1. Try deposit to non-existent account 9999 -> catch AccountException.
         //   2. Try withdraw with wrong PIN -> catch InvalidPinException.
         // ============================================================
-        // TODO: verify exception handling for invalid operations
+        try {
+            service.deposit(9999, 1000);
+        } catch (AccountException e) {
+            System.out.println("  Deposit to missing account caught: " + e.getMessage() + " [PASS]");
+        }
+
+        try {
+            service.withdraw(john.getAccountNumber(), 500, 9999);
+        } catch (InvalidPinException e) {
+            System.out.println("  Withdrawal with wrong PIN caught: " + e.getMessage() + " [PASS]");
+        }
     }
 }

@@ -59,6 +59,9 @@ public class Account {
         if (!validatePin(enteredPin)) {
             throw new InvalidPinException("Invalid PIN entered");
         }
+        if ("CLOSED".equalsIgnoreCase(this.status)) {
+            throw new InactiveAccountException("Account is closed");
+        }
         if (!"ACTIVE".equalsIgnoreCase(this.status)) {
             throw new InactiveAccountException("Account is not active");
         }
